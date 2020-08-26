@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from .models import Question, Choice
 
@@ -37,3 +37,15 @@ def vote(request, question_id):
         selected_choice.votes += 1
         selected_choice.save()
         return HttpResponseRedirect(reverse('polly:results', args=(question.id,)))
+
+
+def resultsdata(request, obj):
+    vote_data = []
+    question = Question.objects.get(pk=obj)
+    votes = question.choice_set.all()
+
+    for i in votes:
+        vote_data.append({i.choice_text: i.votes})
+
+    print(vote_data)
+    return JsonResponse(vote_data, safe=False)
